@@ -1,14 +1,20 @@
 from lib2to3.pytree import Base
+from pytest import Session
 from sqlalchemy import create_engine, Column, Integer, String, engine
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-engine = create_engine('sqlite:///users.db', echo=True)
+# echo True will print in the console (in SQL) what happens when the file is run
+engine = create_engine('sqlite:///users.db', echo=False)
 Base = declarative_base()
+Session = sessionmaker(bind=engine) # binds user to db
+session = Session()
 
 class User(Base):
     __tablename__='users'
 
     id = Column(Integer, primary_key=True)
+    name = Column(String)
     fullname = Column(String)
     nickname = Column(String)
 
@@ -17,3 +23,7 @@ class User(Base):
 
 if __name__=='__main__':
     Base.metadata.create_all(engine)
+
+    meg_user = User(name='Meghan', fullname='Meghan Pund', nickname='Meg')
+    print(meg_user.name, meg_user.id)
+    session.add(meg_user)
